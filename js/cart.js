@@ -2,9 +2,10 @@ import { ProductsService } from './products-service.js';
 import { showAlert } from './alert.js';
 
 export class Cart {
+  static #instance;
   constructor() {
-    if (Cart._instance) return Cart._instance;
-    Cart._instance = this;
+    if (Cart.#instance) return Cart.#instance;
+    Cart.#instance = this;
     this.container = document.querySelector(".cart-container");
     this.productsService = new ProductsService();
     this.cart = JSON.parse(localStorage.getItem("cart") || "{}");
