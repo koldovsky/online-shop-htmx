@@ -1,1 +1,1 @@
-https://koldovsky.github.io/online-shop-simple/
+https://koldovsky.github.io/online-shop-htmx/
