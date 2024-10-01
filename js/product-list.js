@@ -9,15 +9,15 @@ export class ProductList {
         this.renderProducts();
     }
     async renderProducts() {
-        let productListDomString = '';
+        let productListHtml = '';
         const products = await this.productsService.getProducts();
         products.forEach(product => {
-            productListDomString += this.createProductDomString(product);
+            productListHtml += this.createProductHtml(product);
         });
-        this.container.innerHTML = productListDomString;
+        this.container.innerHTML = productListHtml;
         this.addEventListeners();
     }
-    createProductDomString(product) {
+    createProductHtml(product) {
         return `<article class="card col-12 col-sm-6 col-md-4 col-lg-3">
                 <img src="img/${product.image}" class="card-img-top" alt="${product.title}">
                 <div class="card-body">

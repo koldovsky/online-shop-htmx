@@ -1,5 +1,5 @@
-import { ProductsService } from './products-service.js';
-import { showAlert } from './alert.js';
+import { ProductsService } from "./products-service.js";
+import { showAlert } from "./alert.js";
 
 export class Cart {
   static #instance;
@@ -8,7 +8,7 @@ export class Cart {
     Cart.#instance = this;
     this.container = document.querySelector(".cart-container");
     this.productsService = new ProductsService();
-    this.cart = JSON.parse(localStorage.getItem("cart") || "{}");
+    this.cart = JSON.parse(localStorage.getItem("cart") ?? "{}");
     this.addEventListeners();
     this.renderCart();
   }
@@ -18,21 +18,21 @@ export class Cart {
   }
   async renderCart() {
     let total = 0;
-    let cartDomString = `<div class="row">
+    let cartHtml = `<div class="row">
                                 <div class="col-5"><strong>Product</strong></div>
                                 <div class="col-3"><strong>Price</strong></div>
                                 <div class="col-2"><strong>Quantity</strong></div>
                           </div>`;
     for (const productId in this.cart) {
       const product = await this.productsService.getProductById(productId);
-      cartDomString += this.createCartProductDomString(product);
+      cartHtml += this.createCartHtml(product);
       total += product.price * this.cart[productId];
     }
-    cartDomString += ` <div class="row">
+    cartHtml += ` <div class="row">
                           <div class="col-5"><strong>TOTAL</strong></div>
                           <div class="col-3"><strong>$${total.toFixed(2)}</strong></div>
                        </div>`;
-    this.container.innerHTML = cartDomString;
+    this.container.innerHTML = cartHtml;
     this.container
       .querySelectorAll(".plus")
       .forEach((el) => el.addEventListener("click", (ev) => this.changeQuantity(ev, this.addProductOperation)));
@@ -41,7 +41,7 @@ export class Cart {
       .forEach((el) => el.addEventListener("click", (ev) => this.changeQuantity(ev, this.deleteProductOperation)));
     document.querySelector(".cart-badge").innerHTML = Object.keys(this.cart).length;
   }
-  createCartProductDomString(product) {
+  createCartHtml(product) {
     return `<div class="row" data-id="${product.id}"> 
               <div class="col-5">${product.title}</div>
               <div class="col-3">${product.price}</div>
@@ -83,22 +83,23 @@ export class Cart {
     data.append("cart", JSON.stringify(this.cart));
     data.append("name", form.querySelector("input[name=name]").value);
     data.append("email", form.querySelector("input[name=email]").value);
-    fetch("https://formspree.io/f/mrgjwwro", {
+    const response = await fetch("https://formspree.io/f/mrgjwwro", {
       method: "POST",
       headers: {
-        'Accept': 'application/json'
+        Accept: "application/json",
       },
-      body: data
-    })
-      .then(() => {
-        form.reset();
-        this.cart = {};
-        this.saveCart();
-        this.renderCart();
-        showAlert("Thank you! ");
-        document.querySelector("#modal-cart .close-btn").click();
-      })
-      .catch((error) => showAlert("There is an error: " + error, false));
+      body: data,
+    });
+    if (response.ok) {
+      form.reset();
+      this.cart = {};
+      this.saveCart();
+      this.renderCart();
+      showAlert("Thank you! ");
+      document.querySelector("#modal-cart .close-btn").click();
+    } else {
+      showAlert("There is an error: " + error, false);
+    }
   }
 }
 new Cart();

@@ -1,5 +1,5 @@
 export class ProductsService {
-    static #instance;
+    static #instance; 
     constructor() {
         if (!ProductsService.#instance) ProductsService.#instance = this;
         return ProductsService.#instance;
